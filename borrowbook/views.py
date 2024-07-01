@@ -8,6 +8,8 @@ from django.contrib import messages
 from .constants import DEPOSITE, BORROW_BOOK
 from django.db.models import Sum
 from datetime import datetime
+from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.template.loader import render_to_string
 # Create your views here.
 
 class TransactionCreateMixin(LoginRequiredMixin, CreateView):
@@ -59,6 +61,18 @@ class DepositMoneyView(TransactionCreateMixin):
             self.request,
             f'{"{:,.2f}".format(float(amount))}$ was deposited to your account successfully'
         )
+
+        mail_subject = "Deposit Message"
+        message = render_to_string('deposit_email.html',
+            {
+             'user' : self.request.user,
+             'amount':amount
+             }                            
+        )
+        to_email = self.request.user.email
+        send_email = EmailMultiAlternatives(mail_subject, '', to=[to_email])
+        send_email.attach_alternative(message, 'text/html')
+        send_email.send()
 
         return super().form_valid(form)
     

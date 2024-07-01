@@ -51,23 +51,30 @@
           </div>
           <h6>Prices: {{post.borrow_price}}$</h6>
           {% if user.is_authenticated %}
+          {% if not post.borrow %}
           <div class="flex items-center justify-between mt-2 ">
             <a href="{% url "details_post" post.id %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" >
                Details
             </a>
             
-            {% if not post.borrow %}
-          <a href="{% url 'Brrow_Book' post.id %}" class="bg-red-700 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-        Borrow
-    </a>
-    {% else %}
-    <a href="{% url 'comment_post' post.id %}" class="bg-red-700 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-        Comment
-    </a>
-    {% endif %}
+            <a href="{% url 'Brrow_Book' post.id %}" class="bg-red-700 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              Borrow
+           </a>
+          </div>
+        {% else %}
+            <div class="flex items-center justify-between mt-2 ">
+              <a href="{% url 'comment_post' post.id %}" class="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Comment
+              </a>
+            
+            <a href="{% url 'return_Book' post.id %}" class="bg-red-700 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              return
+           </a>
+          </div>
+        {% endif %}
 
             
-        </div>
+       
         {% endif %}
         </div>
       </div>

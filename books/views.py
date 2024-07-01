@@ -1,10 +1,17 @@
 from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from . import forms
 from . import models
+from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView,UpdateView,DeleteView,DetailView
 from django.utils.decorators import method_decorator
+from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.template.loader import render_to_string
+from borrowbook.views import TransactionCreateMixin
+from borrowbook.constants import BORROW_BOOK
+from django.contrib import messages
 # Create your views here.
 
 @method_decorator(login_required, name='dispatch')
@@ -70,16 +77,61 @@ class DetailsPostView(DetailView):
 #     # amount = 5000
 #     self.request.user.account.save(update_fields=['balance'])
 
+    
 def Brrow_Book(request, id):
     book = models.Book.objects.get(pk=id)
-    request.user.account.balance -= book.borrow_price
-    
-    book.borrow = True
+    if request.user.account.balance >= book.borrow_price:
+        request.user.account.balance -= book.borrow_price
+            
+        book.borrow = True
+        book.save(update_fields=['borrow'])
+        print(book.borrow)
+
+        request.user.account.save(update_fields=['balance'])
+        print(book.borrow_price)
+
+        mail_subject = "Book Borrow Message"
+        message = render_to_string('borrow.html',
+                {
+                'user' : request.user,
+                'amount':book.borrow_price,
+                'book_name':book.book_name,
+                }                            
+            )
+        messages.success(request, f'Borrow Book {book.book_name} successful.')
+        to_email = request.user.email
+        send_email = EmailMultiAlternatives(mail_subject, '', to=[to_email])
+        send_email.attach_alternative(message, 'text/html')
+        send_email.send()
+        return redirect('homepage')
+    else:
+       messages.error(request,f'Insufficient  Balance')
+       return redirect('homepage')
+
+
+def Return_Book(request, id):
+    book = models.Book.objects.get(pk=id)
+    request.user.account.balance += book.borrow_price
+        
+    book.borrow = False
     book.save(update_fields=['borrow'])
     print(book.borrow)
 
     request.user.account.save(update_fields=['balance'])
     print(book.borrow_price)
+    messages.success(request, f'Return Book {book.book_name} successful.')
+    mail_subject = "Book Return Message"
+    message = render_to_string('deposit_email.html',
+            {
+            'user' : request.user,
+            'amount':book.borrow_price,
+            'book_name':book.book_name,
+            }                            
+        )
+    to_email = request.user.email
+    send_email = EmailMultiAlternatives(mail_subject, '', to=[to_email])
+    send_email.attach_alternative(message, 'text/html')
+    send_email.send()
     return redirect('homepage')
 
 

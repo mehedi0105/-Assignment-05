@@ -3,6 +3,14 @@
 {% load humanize %}
 {% block head_title %} Transaction Report{% endblock %} {% block content %}
 
+<div class="bg-white px-3 py-4 rounded-xl my-6">
+  <h4 class="font-bold text-3xl text-left pb-5">User Id: {{request.user.account.user_iid}}</h4>
+  <a href="{% url 'profile_update' %}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Click and Update profile Information</a>
+  <a href="{% url 'pass_change' %}" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800">Click and Change Password</a>
+  {% comment %} <a href="{% url 'transaction_report' %}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+      Transaction Report
+  </a> {% endcomment %}
+</div>
 
 <div class="my-10 py-3 px-4 bg-white rounded-xl shadow-md">
   <h1 class="font-bold text-3xl text-center pb-5 pt-2">Transaction Report</h1>
